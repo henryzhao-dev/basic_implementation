@@ -5,6 +5,7 @@
 #include "MyHashMap.h"
 
 #include <stdexcept>
+#include <iostream>
 
 MyHashMap::MyHashMap() {
     capacity = 8;
@@ -71,6 +72,73 @@ int MyHashMap::get(int key) {
 
     throw std::out_of_range("key not found");
 }
+
+void MyHashMap::remove(int key) {
+    int index = hash(key);
+
+    Entry* current = buckets[index];
+    Entry* prev = nullptr;
+
+    while (current != nullptr) {
+        if (current->key == key) {
+            if (prev == nullptr) {
+                buckets[index] = current->next;
+            } else {
+                prev->next = current->next;
+            }
+
+            delete current;
+            size--;
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+
+    throw std::out_of_range("key not found");
+}
+
+bool MyHashMap::containsKey(int key) {
+    int index = hash(key);
+
+    Entry* current = buckets[index];
+
+    while (current != nullptr) {
+        if (current->key == key) {
+            return true;
+        }
+
+        current = current->next;
+    }
+    return false;
+}
+
+int MyHashMap::getSize() {
+    return size;
+}
+
+bool MyHashMap::isEmpty() {
+    return size == 0;
+}
+
+void MyHashMap::print() {
+    for (int i = 0; i < capacity; ++i) {
+        std::cout << "bucket[" << i << "]: ";
+
+        Entry* current = buckets[i];
+
+        while (current != nullptr) {
+            std::cout << "(" << current->key << ", " << current->value << ") -> ";
+            current = current->next;
+        }
+
+        std::cout << "nullptr" << std::endl;
+    }
+}
+
+
+
+
 
 
 

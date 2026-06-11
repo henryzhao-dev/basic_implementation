@@ -26,6 +26,11 @@ public:
 
     void put(int key, int value);
     int get(int key);
+    void remove(int key);
+    bool containsKey(int key);
+    int getSize();
+    bool isEmpty();
+    void print();
 
 
 };
