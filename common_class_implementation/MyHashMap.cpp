@@ -19,15 +19,7 @@ MyHashMap::MyHashMap() {
 }
 
 MyHashMap::~MyHashMap() {
-    for (int i = 0; i < capacity; ++i) {
-        Entry* current = buckets[i];
-
-        while (current != nullptr) {
-            Entry* nextEntry = current->next;
-            delete current;
-            current = nextEntry;
-        }
-    }
+    clearBucket();
     delete[] buckets;
 }
 
@@ -36,7 +28,103 @@ int MyHashMap::hash(int key) {
     return key % capacity;
 }
 
+void MyHashMap::resize() {
+    int oldCapacity = capacity;
+    Entry** oldBuckets = buckets;
+
+    capacity = capacity * 2;
+    buckets = new Entry*[capacity];
+
+    for (int i = 0; i < capacity; ++i) {
+        buckets[i] = nullptr;
+    }
+
+    size = 0;
+
+    for (int i = 0; i < capacity; ++i) {
+        Entry* current = oldBuckets[i];
+
+        while (current != nullptr) {
+            put(current->key, current->value);
+
+            Entry* oldEntry = current;
+            current = current->next;
+            delete oldEntry;
+        }
+    }
+    delete[] oldBuckets;
+}
+
+void MyHashMap::clearBucket() {
+    for (int i = 0; i < capacity; ++i) {
+        Entry* current = buckets[i];
+
+        while (current != nullptr) {
+            Entry* nextEntry = current->next;
+            delete current;
+            current = nextEntry;
+        }
+        buckets[i] = nullptr;
+    }
+    size = 0;
+}
+
+MyHashMap::MyHashMap(const MyHashMap &other) {
+    capacity = other.capacity;
+    size = 0;
+
+    buckets = new Entry*[capacity];
+
+    for (int i = 0; i < capacity; ++i) {
+        buckets[i] = nullptr;
+    }
+
+    for (int i = 0; i < other.capacity; ++i) {
+        Entry* current = other.buckets[i];
+
+        while (current != nullptr) {
+            put(current->key, current->value);
+            current = current->next;
+        }
+    }
+}
+
+MyHashMap &MyHashMap::operator=(const MyHashMap &other) {
+    if (this == &other) {
+        return *this;
+    }
+
+    clearBucket();
+    delete[] buckets;
+
+    capacity = other.capacity;
+    size = 0;
+
+    buckets = new Entry*[capacity];
+
+    for (int i = 0; i < capacity; ++i) {
+        buckets[i] = nullptr;
+    }
+
+    for (int i = 0; i < other.capacity; ++i) {
+        Entry* current = other.buckets[i];
+
+        while (current != nullptr) {
+            put(current->key, current->value);
+            current = current->next;
+        }
+    }
+    return *this;
+}
+
+
+
+
 void MyHashMap::put(int key, int value) {
+    if (size >= capacity * 0.75) {
+        resize();
+    }
+
     int index = hash(key);
 
     Entry* current = buckets[index];

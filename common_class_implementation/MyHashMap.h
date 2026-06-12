@@ -19,10 +19,15 @@ private:
     int capacity;
     int size;
     int hash(int key);
+    void resize();
+    void clearBucket();
 
 public:
     MyHashMap();
     ~MyHashMap();
+
+    MyHashMap(const MyHashMap& other);
+    MyHashMap& operator=(const MyHashMap& other);
 
     void put(int key, int value);
     int get(int key);
