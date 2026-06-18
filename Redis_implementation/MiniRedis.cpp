@@ -46,8 +46,12 @@ std::string MiniRedis::type(const std::string &key) {
         return "string";
     }
 
-    if (obj.type == List) {
+    if (obj.type == LIST) {
         return "list";
+    }
+
+    if (obj.type == HASH) {
+        return "hash";
     }
 
     return "unknown";
@@ -58,7 +62,7 @@ void MiniRedis::lpush(const std::string &key, const std::string &value) {
 
     if (it == db.end()) {
         RedisObject obj;
-        obj.type = List;
+        obj.type = LIST;
         obj.listValue.push_front(value);
         db[key] = obj;
         return;
@@ -66,7 +70,7 @@ void MiniRedis::lpush(const std::string &key, const std::string &value) {
 
     RedisObject& obj = it->second;
 
-    if (obj.type != List) {
+    if (obj.type != LIST) {
         throw std::runtime_error("wrong type");
     }
 
@@ -78,7 +82,7 @@ void MiniRedis::rpush(const std::string &key, const std::string &value) {
 
     if (it == db.end()) {
         RedisObject obj;
-        obj.type = List;
+        obj.type = LIST;
         obj.listValue.push_back(value);
         db[key] = obj;
         return;
@@ -86,7 +90,7 @@ void MiniRedis::rpush(const std::string &key, const std::string &value) {
 
     RedisObject& obj = it->second;
 
-    if (obj.type != List) {
+    if (obj.type != LIST) {
         throw std::runtime_error("wrong type");
     }
 
@@ -102,7 +106,7 @@ std::string MiniRedis::lpop(const std::string &key) {
 
     RedisObject& obj = it->second;
 
-    if (obj.type != List) {
+    if (obj.type != LIST) {
         throw std::runtime_error("wrong type");
     }
 
@@ -125,7 +129,7 @@ std::string MiniRedis::rpop(const std::string &key) {
 
     RedisObject& obj = it->second;
 
-    if (obj.type != List) {
+    if (obj.type != LIST) {
         throw std::runtime_error("wrong type");
     }
 
@@ -138,6 +142,50 @@ std::string MiniRedis::rpop(const std::string &key) {
 
     return value;
 }
+
+void MiniRedis::hset(const std::string &key, const std::string &field, const std::string &value) {
+    auto it = db.find(key);
+
+    if (it == db.end()) {
+        RedisObject obj;
+        obj.type = HASH;
+        obj.hashValue[field] = value;
+        db[key] = obj;
+        return;
+    }
+
+    RedisObject& obj = it->second;
+
+    if (obj.type != HASH) {
+        throw std::runtime_error("wrong type");
+    }
+
+    obj.hashValue[field] = value;
+}
+
+std::string MiniRedis::hget(const std::string &key, const std::string &field) {
+    auto it = db.find(key);
+
+    if (it == db.end()) {
+        throw std::out_of_range("key not found");
+    }
+
+    RedisObject& obj = it->second;
+
+    if (obj.type != HASH) {
+        throw std::runtime_error("wrong type");
+    }
+
+    auto fieldIt = obj.hashValue.find(field);
+
+    if (fieldIt == obj.hashValue.end()) {
+        throw std::out_of_range("field not found");
+    }
+
+    return fieldIt->second;
+}
+
+
 
 
 

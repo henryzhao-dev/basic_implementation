@@ -14,7 +14,8 @@
 
 enum RedisType {
     STRING,
-    List
+    LIST,
+    HASH
 };
 
 struct RedisObject {
@@ -22,6 +23,7 @@ struct RedisObject {
 
     std::string stringValue;
     std::deque<std::string> listValue;
+    std::unordered_map<std::string, std::string> hashValue;
 };
 
 class MiniRedis {
@@ -38,6 +40,9 @@ public:
     void rpush(const std::string& key, const std::string& value);
     std::string lpop(const std::string& key);
     std::string rpop(const std::string& key);
+
+    void hset(const std::string& key, const std::string& field, const std::string& value);
+    std::string hget(const std::string& key, const std::string& field);
 };
 
 
