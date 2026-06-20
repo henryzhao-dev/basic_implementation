@@ -9,13 +9,15 @@
 #include <string>
 #include <unordered_map>
 #include <deque>
+#include <unordered_set>
 
 
 
 enum RedisType {
     STRING,
     LIST,
-    HASH
+    HASH,
+    SET
 };
 
 struct RedisObject {
@@ -24,6 +26,7 @@ struct RedisObject {
     std::string stringValue;
     std::deque<std::string> listValue;
     std::unordered_map<std::string, std::string> hashValue;
+    std::unordered_set<std::string> setValue;
 };
 
 class MiniRedis {
@@ -43,6 +46,9 @@ public:
 
     void hset(const std::string& key, const std::string& field, const std::string& value);
     std::string hget(const std::string& key, const std::string& field);
+
+    void sadd(const std::string& key, const std::string& value);
+    bool sismember(const std::string& key, const std::string& value);
 };
 
 

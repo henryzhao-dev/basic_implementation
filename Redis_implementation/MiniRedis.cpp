@@ -185,6 +185,44 @@ std::string MiniRedis::hget(const std::string &key, const std::string &field) {
     return fieldIt->second;
 }
 
+void MiniRedis::sadd(const std::string &key, const std::string &value) {
+    auto it = db.find(key);
+
+    if (it == db.end()) {
+        RedisObject obj;
+        obj.type = SET;
+        obj.setValue.insert(value);
+        db[key] = obj;
+        return;
+    }
+
+    RedisObject& obj = it->second;
+
+    if (obj.type != SET) {
+        throw std::runtime_error("wrong type");
+    }
+
+    obj.setValue.insert(value);
+}
+
+bool MiniRedis::sismember(const std::string &key, const std::string &value) {
+    auto it = db.find(key);
+
+    if (it == db.end()) {
+        return false;
+    }
+
+    RedisObject& obj = it->second;
+
+    if (obj.type != SET) {
+        throw std::runtime_error("wrong type");
+    }
+
+    return obj.setValue.find(value) != obj.setValue.end();
+}
+
+
+
 
 
 
