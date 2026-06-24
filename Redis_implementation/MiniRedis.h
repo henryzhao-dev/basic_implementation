@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <deque>
 #include <unordered_set>
+#include <map>
+#include <vector>
 
 
 
@@ -17,7 +19,8 @@ enum RedisType {
     STRING,
     LIST,
     HASH,
-    SET
+    SET,
+    ZSET
 };
 
 struct RedisObject {
@@ -27,6 +30,7 @@ struct RedisObject {
     std::deque<std::string> listValue;
     std::unordered_map<std::string, std::string> hashValue;
     std::unordered_set<std::string> setValue;
+    std::map<double, std::string> zsetValue;
 };
 
 class MiniRedis {
@@ -49,6 +53,9 @@ public:
 
     void sadd(const std::string& key, const std::string& value);
     bool sismember(const std::string& key, const std::string& value);
+
+    void zadd(const std::string& key, double score, const std::string& member);
+    std::vector<std::string> zrange(const std::string& key);
 };
 
 

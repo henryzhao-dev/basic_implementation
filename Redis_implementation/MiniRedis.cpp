@@ -54,6 +54,11 @@ std::string MiniRedis::type(const std::string &key) {
         return "hash";
     }
 
+    if (obj.type == SET) {
+        return "set";
+    }
+
+
     return "unknown";
 }
 
@@ -220,6 +225,50 @@ bool MiniRedis::sismember(const std::string &key, const std::string &value) {
 
     return obj.setValue.find(value) != obj.setValue.end();
 }
+
+void MiniRedis::zadd(const std::string &key, double score, const std::string &member) {
+    auto it = db.find(key);
+
+    if (it == db.end()) {
+        RedisObject obj;
+        obj.type = ZSET;
+        obj.zsetValue[score] = member;
+        db[key] = obj;
+        return;
+    }
+
+    RedisObject& obj = it->second;
+
+    if (obj.type != ZSET) {
+        throw std::runtime_error("wrong type");
+    }
+
+    obj.zsetValue[score] = member;
+}
+
+std::vector<std::string> MiniRedis::zrange(const std::string &key) {
+    auto it = db.find(key);
+
+    if (it == db.end()) {
+        return {};
+    }
+
+    RedisObject& obj = it->second;
+
+    if (obj.type != ZSET) {
+        throw std::runtime_error("wrong type");
+    }
+
+    std::vector<std::string> result;
+
+    for (auto& pair : obj.zsetValue) {
+        result.push_back(pair.second);
+    }
+
+    return result;
+}
+
+
 
 
 
