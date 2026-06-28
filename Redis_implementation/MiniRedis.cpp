@@ -58,6 +58,10 @@ std::string MiniRedis::type(const std::string &key) {
         return "set";
     }
 
+    if (obj.type == ZSET) {
+        return "zset";
+    }
+
 
     return "unknown";
 }
